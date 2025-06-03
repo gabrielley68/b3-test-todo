@@ -59,4 +59,8 @@ describe('task/ GET', () => {
 
         expect(results.map(x => x.id)).toEqual([tasks[0].id, tasks[2].id]);
     });
+
+    it('should break', () => {
+        except(true).toBe(false);
+    }
 });
