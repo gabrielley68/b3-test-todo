@@ -124,7 +124,7 @@ router.get('/', async (req, res) => {
     let { page = 1, limit = 5 } = req.query;
 
     const whereClauses = {
-        // UserId: req.user.id
+        UserId: req.user.id
     };
 
     page = parseInt(page);
@@ -157,10 +157,6 @@ router.get('/', async (req, res) => {
             include: Type,
             attributes: {exclude: ['TypeId']}
         });
-
-        for(let task of tasks){
-            await task.getType()
-        }
 
         res.json({
             total: count,

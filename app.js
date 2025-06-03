@@ -47,7 +47,7 @@ app.use('/auth', authRouter);
 
 // Le middleware authenticate est placé ici de façon à ne pas impacter
 // les routeurs index & auth (qui sont publics)
-// app.use(authenticate);
+app.use(authenticate);
 
 app.use('/tasks', taskRouter);
 app.use('/legacy/tasks', legacyTaskRouter);

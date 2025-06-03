@@ -4,5 +4,6 @@ export default defineConfig({
   test: {
     environment: 'node',
     globalSetup: "tests/setup.js",
+    fileParallelism: false
   },
 });
