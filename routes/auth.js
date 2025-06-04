@@ -3,6 +3,10 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
 const { User } = require('../models');
+const {
+    validatePassword,
+    EXPLANATIONS
+} = require('../utils/password_validator');
 
 const router = express.Router();
 
@@ -15,9 +19,11 @@ router.post('/signup', async (req, res) => {
         return;
     }
 
-    if(password.length < 8){
+    const errors = validatePassword(password, display_name);
+    const errorsExplanations = errors.map(x => EXPLANATIONS[x]);
+    if(errors.length){
         res.status(400);
-        res.json({error: "Password must be atleast 8 characters long"});
+        res.json({error: "Password is not strong enough : " + errorsExplanations.join(" - ")});
         return;
     }
 

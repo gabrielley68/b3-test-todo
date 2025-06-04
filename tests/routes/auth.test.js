@@ -6,6 +6,8 @@ import app from '/app';
 import { User } from '/models';
 import UserFactory from '/factories/UserFactory';
 
+const STRONG_PASSWORD = "3hW2RdkiAgY4biqNxS/u9Nt40P6qAFUEg9PxMxhPdOE";
+
 afterEach(async () => {
     await User.destroy({where: {}});
 });
@@ -20,18 +22,18 @@ describe("signup", () => {
     it('needs atleast 8 characters password', async () => {
         const response = await request(app).post('/auth/signup').send({
             email: 'gabriel@mailinator.com',
-            password: '1234',
+            password: "motdepasse",
             display_name: "Toto"
         });
 
         expect(response.status).toBe(400);
-        expect(response.body.error).toBe('Password must be atleast 8 characters long');
+        expect(response.body.error).toMatch(/Password is not strong enough/);
     });
 
     it('validates email format', async () => {
         const response = await request(app).post('/auth/signup').send({
             email: "blablabla",
-            password: 'somepassword',
+            password: STRONG_PASSWORD,
             display_name: "Toto"
         });
 
@@ -39,12 +41,12 @@ describe("signup", () => {
         expect(response.body.error).toBe('The email is not valid or already used');
     });
 
-    it.skip('cant use same email twice', async () => {
+    it('cant use same email twice', async () => {
         const existingUser = await User.create(UserFactory.one());
 
         const response = await request(app).post('/auth/signup').send({
             email: existingUser.email,
-            password: 'somepassword',
+            password: STRONG_PASSWORD,
             display_name: "Toto"
         });
 
@@ -70,7 +72,7 @@ describe("login", () => {
     it('expects an existing email', async () => {
         const response = await request(app).post('/auth/login').send({
             email: 'unknown@mailinator.com',
-            password: '1234'
+            password: STRONG_PASSWORD
         });
 
         expect(response.status).toBe(400);
@@ -81,7 +83,7 @@ describe("login", () => {
         const user = await User.create(UserFactory.one());
         const response = await request(app).post('/auth/login').send({
             email: user.email,
-            password: '1234'
+            password: "random password"
         });
 
         expect(response.status).toBe(400);
@@ -89,11 +91,11 @@ describe("login", () => {
     });
 
     it('generates a jwt token on successful login', async () => {
-        const userData = UserFactory.one();
+        const userData = UserFactory.one({overrides: {'password': STRONG_PASSWORD}});
         const user = await User.create(userData);
         const response = await request(app).post('/auth/login').send({
             email: user.email,
-            password: userData.password
+            password: STRONG_PASSWORD
         });
 
         expect(response.status).toBe(200);

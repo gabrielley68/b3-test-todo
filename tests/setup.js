@@ -7,6 +7,6 @@ export async function setup(){
 }
 
 export async function teardown(){
-    // await sequelize.drop();
+    await sequelize.drop();
     await sequelize.close();
 };

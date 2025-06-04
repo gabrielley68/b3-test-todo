@@ -79,4 +79,21 @@ describe('task/ GET', () => {
 
         expect(results.map(x => x.id)).toEqual([tasks[0].id, tasks[2].id]);
     });
+
+    it('only gets tasks of users', async () => {
+        const otherUser = await User.create(UserFactory.one());
+        const tasks = await Task.bulkCreate([
+            TaskFactory.one({overrides: {UserId: user.id}}),
+            TaskFactory.one({overrides: {UserId: otherUser.id}})
+        ]);
+
+        const response = await request(app).get('/tasks');
+        expect(response.status).toBe(200);
+
+        const results = response.body.results;
+
+        expect(results.map(x => x.id)).toEqual([tasks[0].id]);
+
+        await otherUser.destroy();
+    });
 });
